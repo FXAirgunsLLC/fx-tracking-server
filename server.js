@@ -1,8 +1,8 @@
 const https = require('https');
 const http = require('http');
 
-const FEDEX_CLIENT_ID = 'b32282ce75e74e8bb8d5e917cc36d017';
-const FEDEX_CLIENT_SECRET = '67af96786f004773a83fcdf7bb28a12f';
+const FEDEX_CLIENT_ID = 'l781069ea65fa949a9a50e3be5fc9a1883';
+const FEDEX_CLIENT_SECRET = '8d3f9c8cce9341cf98d87d14d64fc7d7';
 
 function fetchJSON(options, postData) {
   return new Promise((resolve, reject) => {
