@@ -1,0 +1,12 @@
+{
+  "name": "fx-tracking-server",
+  "version": "1.0.0",
+  "description": "FedEx tracking proxy for FX Airguns inbound shipment tracker",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
