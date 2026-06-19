@@ -260,7 +260,11 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname === '/bill-register' && req.method === 'GET') {
     try {
       const sessionId = await getBillSession();
+      // Register webhook using v3 API with correct production endpoint
+      const idempotentKey = require('crypto').randomUUID();
       const subBody = JSON.stringify({
+        name: 'FX Airguns Release App',
+        status: { enabled: true },
         notificationUrl: 'https://fx-tracking-server.onrender.com/bill-webhook',
         events: [
           { type: 'invoice.updated', version: '1' },
@@ -270,12 +274,13 @@ const server = http.createServer(async (req, res) => {
       });
       const result = await fetchJSON({
         hostname: 'gateway.bill.com',
-        path: '/connect/v3/subscriptions',
+        path: '/connect-events/v3/subscriptions',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'devKey': BILL_DEV_KEY,
           'sessionId': sessionId,
+          'X-Idempotent-Key': idempotentKey,
           'Content-Length': Buffer.byteLength(subBody)
         }
       }, subBody);
