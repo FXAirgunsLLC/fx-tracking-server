@@ -255,6 +255,40 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ── Bill.com webhook registration (one-time setup) ──
+  if (url.pathname === '/bill-register' && req.method === 'GET') {
+    try {
+      const sessionId = await getBillSession();
+      const subBody = JSON.stringify({
+        notificationUrl: 'https://fx-tracking-server.onrender.com/bill-webhook',
+        events: [
+          { type: 'invoice.updated', version: '1' },
+          { type: 'receivedpayment.created', version: '1' },
+          { type: 'receivedpayment.updated', version: '1' }
+        ]
+      });
+      const result = await fetchJSON({
+        hostname: 'gateway.bill.com',
+        path: '/connect/v3/subscriptions',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'devKey': BILL_DEV_KEY,
+          'sessionId': sessionId,
+          'Content-Length': Buffer.byteLength(subBody)
+        }
+      }, subBody);
+      console.log('Bill.com registration result:', JSON.stringify(result.body));
+      res.writeHead(200);
+      res.end(JSON.stringify({ ok: true, result: result.body }));
+    } catch(e) {
+      console.error('Registration error:', e.message);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
   // ── Health check ────────────────────────────────────
   if (url.pathname === '/health') {
     res.writeHead(200); res.end(JSON.stringify({ ok: true, server: 'FX Airguns tracking + Bill.com webhook' }));
