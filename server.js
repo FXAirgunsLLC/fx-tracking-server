@@ -105,15 +105,12 @@ async function getBillSession() {
     return billSession;
   }
 
-  const params = new URLSearchParams({
-    devKey: BILL_DEV_KEY,
-    data: JSON.stringify({
-      userName: BILL_USERNAME,
-      password: BILL_PASSWORD,
-      orgId: BILL_ORG_ID,
-      devKey: BILL_DEV_KEY
-    })
-  }).toString();
+  const params = [
+    'userName=' + encodeURIComponent(BILL_USERNAME),
+    'password=' + encodeURIComponent(BILL_PASSWORD),
+    'orgId=' + encodeURIComponent(BILL_ORG_ID),
+    'devKey=' + encodeURIComponent(BILL_DEV_KEY)
+  ].join('&');
 
   const result = await fetchJSON({
     hostname: 'api.bill.com',
