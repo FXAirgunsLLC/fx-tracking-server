@@ -106,11 +106,10 @@ async function getBillSession() {
   }
 
   const body = JSON.stringify({
-    username: BILL_USERNAME,
+    userName: BILL_USERNAME,
     password: BILL_PASSWORD,
     orgId: BILL_ORG_ID,
-    devKey: BILL_DEV_KEY,
-    applicationKey: BILL_DEV_KEY
+    devKey: BILL_DEV_KEY
   });
 
   const result = await fetchJSON({
