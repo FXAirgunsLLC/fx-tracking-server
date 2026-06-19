@@ -105,23 +105,25 @@ async function getBillSession() {
     return billSession;
   }
 
-  const body = JSON.stringify({
-    userName: BILL_USERNAME,
-    password: BILL_PASSWORD,
-    orgId: BILL_ORG_ID,
-    devKey: BILL_DEV_KEY
-  });
+  const params = new URLSearchParams({
+    devKey: BILL_DEV_KEY,
+    data: JSON.stringify({
+      userName: BILL_USERNAME,
+      password: BILL_PASSWORD,
+      orgId: BILL_ORG_ID,
+      devKey: BILL_DEV_KEY
+    })
+  }).toString();
 
   const result = await fetchJSON({
     hostname: 'api.bill.com',
     path: '/api/v2/Login.json',
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(body),
-      'devKey': BILL_DEV_KEY
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Length': Buffer.byteLength(params)
     }
-  }, body);
+  }, params);
 
   if (result.body.response_status !== 0) {
     throw new Error('Bill.com auth failed: ' + JSON.stringify(result.body));
