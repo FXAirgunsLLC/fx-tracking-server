@@ -18,6 +18,8 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 // ── Bill.com session cache ────────────────────────────
 let billSession = null;
 let billSessionExpiry = null;
+const BILL_TOKEN_NAME = process.env.BILL_TOKEN_NAME;
+const BILL_TOKEN_VALUE = process.env.BILL_TOKEN_VALUE;
 
 // ── Helpers ───────────────────────────────────────────
 function fetchJSON(options, postData) {
@@ -105,9 +107,10 @@ async function getBillSession() {
     return billSession;
   }
 
+  // Use AP/AR sync token - bypasses MFA requirement
   const params = [
-    'userName=' + encodeURIComponent(BILL_USERNAME),
-    'password=' + encodeURIComponent(BILL_PASSWORD),
+    'userName=' + encodeURIComponent(BILL_TOKEN_NAME),
+    'password=' + encodeURIComponent(BILL_TOKEN_VALUE),
     'orgId=' + encodeURIComponent(BILL_ORG_ID),
     'devKey=' + encodeURIComponent(BILL_DEV_KEY)
   ].join('&');
@@ -127,9 +130,9 @@ async function getBillSession() {
   }
 
   billSession = result.body.response_data.sessionId;
-  // Sessions last 35 minutes, refresh after 30
-  billSessionExpiry = Date.now() + (30 * 60 * 1000);
-  console.log('Bill.com session established');
+  // Sessions last 48 hours with sync token, refresh after 40 hours
+  billSessionExpiry = Date.now() + (40 * 60 * 60 * 1000);
+  console.log('Bill.com session established with sync token');
   return billSession;
 }
 
