@@ -218,30 +218,13 @@ const server = http.createServer(async (req, res) => {
         const eventType = event.type || event.eventType || '';
         console.log('Event type:', eventType);
 
-        // Handle invoice paid / payment received events
-        if (
-          eventType.includes('invoice') ||
-          eventType.includes('payment') ||
-          eventType.includes('receivedpayment')
-        ) {
-          let invoiceNumber = null;
+        // Handle invoice.updated - check if status is PAID_IN_FULL
+        if (eventType === 'invoice.updated') {
+          const invoice = event.invoice;
+          console.log('Invoice update:', JSON.stringify(invoice));
 
-          // Parse the payload - Bill.com escapes it as a string
-          let innerPayload = event.payload;
-          if (typeof innerPayload === 'string') {
-            try { innerPayload = JSON.parse(innerPayload); } catch(e) {}
-          }
-
-          // Try to find invoice number in various locations
-          invoiceNumber = 
-            innerPayload?.invoice?.invoiceNumber ||
-            innerPayload?.invoiceNumber ||
-            innerPayload?.invoice?.number ||
-            innerPayload?.receivedPayment?.invoiceNumber ||
-            null;
-
-          if (invoiceNumber) {
-            const result = await markInvoicePaid(invoiceNumber);
+          if (invoice && invoice.status === 'PAID_IN_FULL' && invoice.invoiceNumber) {
+            const result = await markInvoicePaid(invoice.invoiceNumber);
             console.log('Update result:', result);
           }
         }
@@ -267,9 +250,7 @@ const server = http.createServer(async (req, res) => {
         status: { enabled: true },
         notificationUrl: 'https://fx-tracking-server.onrender.com/bill-webhook',
         events: [
-          { type: 'invoice.updated', version: '1' },
-          { type: 'receivedpayment.created', version: '1' },
-          { type: 'receivedpayment.updated', version: '1' }
+          { type: 'invoice.updated', version: '1' }
         ]
       });
       const result = await fetchJSON({
