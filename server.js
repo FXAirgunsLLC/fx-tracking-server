@@ -273,7 +273,7 @@ const server = http.createServer(async (req, res) => {
         ]
       });
       const result = await fetchJSON({
-        hostname: 'gateway.bill.com',
+        hostname: 'gateway.prod.bill.com',
         path: '/connect-events/v3/subscriptions',
         method: 'POST',
         headers: {
